@@ -1,10 +1,9 @@
 //smalloc.c
 //a safer, though simple, version of malloc
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "smalloc.h"
-
 
 void *
 smalloc(size_t size)
