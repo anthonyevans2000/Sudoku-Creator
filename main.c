@@ -9,7 +9,7 @@ int main()
 	sudoku_board * f;
 	f = (sudoku_board *) sudokucreator();
 	srand(time(NULL));
-	
+
 	random_board(f);
 	
 	

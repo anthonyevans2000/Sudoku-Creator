@@ -27,9 +27,9 @@ void value_filler(sudoku_board *board)
 		for(j=0; j<9; j++)
 		{	
 			board->values[i][j] = (value_head *) smalloc(sizeof(value_head));
-			board->values[i][j]->length = 9;
+			board->values[i][j]->length = 10;
 			board->values[i][j]->first = NULL;
-			for(k=9; k>0; k--)
+			for(k=1; k<=9; k++)
 			{
 				insert_value(board->values[i][j],k);
 			}
@@ -59,7 +59,7 @@ void delete_value(value_head* head, int val)
 	last = NULL;
 	if(head->first == NULL) return;
 
-	for(now=head->first;now->next != NULL; now= (value *)now->next)
+	for(now=head->first;; now = (value *)now->next)
 	{	
 		if(now->available == val)
 		{
@@ -71,10 +71,21 @@ void delete_value(value_head* head, int val)
 				last->next = (value *) now->next;
 			}
 			head->length -=1;
-			continue;
+
+			if(now->next == NULL)
+			{
+				break;
+			}else
+			{
+				continue;
+			}
 			//free(now);
 		}
 		last=now;
+		if(now->next == NULL)
+		{
+			return;
+		}
 	}
 
 }
@@ -83,14 +94,17 @@ void delete_value(value_head* head, int val)
 
 void random_board(sudoku_board *sudoku)
 {
-	int value;
+	int value,i;
 	board_position *spot;
-	
-	for(spot = get_unfilled_space(sudoku);spot!= NULL;spot=get_unfilled_space(sudoku))
+	i=0;
+	for(spot = get_unfilled_space(sudoku);i<82;spot=get_unfilled_space(sudoku))
 	{
 		fill_with_random_sudoku_value(spot);
+		printf("Filling %d %d with %d\n",spot->i,spot->j,spot->value);
+		fflush(stdout);
 		sudoku->board[spot->i][spot->j] = spot->value;
 		remove_invalid(sudoku,spot);
+		i++;
 	}
 
 }
@@ -131,8 +145,6 @@ void remove_same_from_square(sudoku_board *sudoku, board_position *spot)
 	{
 		for(l=0;l<3;l++)
 		{
-			printf("%d %d\n",(i*3)+k,(j*3)+l);
-			fflush(stdout);
 			delete_value(sudoku->values[(i*3)+k][(j*3)+l],spot->value);
 		}
 	}
@@ -143,18 +155,21 @@ void fill_with_random_sudoku_value(board_position *spot)
 {
 	int i,j;
 	value *val;
-	i = ((rand()%(spot->values->length))+1);
-	printf("in fill\n");
-	fflush(stdout);
+	if(spot->values->length == 0)
+	{
+		printf("it's zero!\n");
+		fflush(stdout);
+		return;
+	}
+
+	i = (int)(rand()%((spot->values->length)+1));
 	val = spot->values->first;
-	printf("in fill2 %d\n",spot->values->length);
-	fflush(stdout);
-	for(j=1;(j<i)&&(val->next !=NULL);j++)
-	{	printf("%d\n",j);
+	
+	for(j=0;(j<i)&&(val->next !=NULL);j++)
+	{
 		val = (value *) val->next;
 	}
-	printf("leaving fill\n");
-	fflush(stdout);
+	printf("filling spot->value with %d\n",val->available);
 	spot->value = val->available;
 }
 
