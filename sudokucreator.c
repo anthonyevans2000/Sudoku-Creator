@@ -40,6 +40,7 @@ void value_filler(sudoku_board *board)
 	null_board(board);
 }
 
+
 void insert_value(value_head* head, int val)
 {
 	value *value_ptr, *first;
@@ -97,11 +98,9 @@ void random_board(sudoku_board *sudoku)
 	int value,i;
 	board_position *spot;
 	i=0;
-	for(spot = get_unfilled_space(sudoku);i<82;spot=get_unfilled_space(sudoku))
+	for(spot = get_unfilled_space(sudoku);i<82 && get_unfilled_space(sudoku) != NULL;spot=get_unfilled_space(sudoku))
 	{
 		fill_with_random_sudoku_value(spot);
-		printf("Filling %d %d with %d\n",spot->i,spot->j,spot->value);
-		fflush(stdout);
 		sudoku->board[spot->i][spot->j] = spot->value;
 		remove_invalid(sudoku,spot);
 		i++;
@@ -157,8 +156,6 @@ void fill_with_random_sudoku_value(board_position *spot)
 	value *val;
 	if(spot->values->length == 0)
 	{
-		printf("it's zero!\n");
-		fflush(stdout);
 		return;
 	}
 
@@ -169,7 +166,6 @@ void fill_with_random_sudoku_value(board_position *spot)
 	{
 		val = (value *) val->next;
 	}
-	printf("filling spot->value with %d\n",val->available);
 	spot->value = val->available;
 }
 
@@ -177,22 +173,47 @@ void fill_with_random_sudoku_value(board_position *spot)
 void * get_unfilled_space(sudoku_board* sudoku)
 {
 	board_position *spot;
-	int i, j;
-	for(i=0; i<9; i++)
+	spot = (board_position *) smalloc(sizeof(board_position));
+	spot->values = NULL;
+
+	
+	int i,j,k,l,x,y,spot_exists=0;
+	for(k=0; k<3; k++)
 	{
-		for(j=0; j<9; j++)
+		for(l=0; l<3; l++)
 		{
-		 	if (sudoku->board[i][j]== 0)
+			for(i=0; i<3; i++)
 			{
-				spot = (board_position *) smalloc(sizeof(board_position));
-				spot->i=i;
-				spot->j=j;
-				spot->values = sudoku->values[i][j];
-				return spot;
+				for(j=0; j<3; j++)
+				{	x = i+(k*3);
+					y = j+(l*3);
+					if ((sudoku->board[x][y]== 0))
+					{
+						if(spot->values!=NULL)
+						{
+							if(spot->values->length < sudoku->values[x][y]->length)
+							{
+								continue;	
+							}	
+						}else
+						{
+							spot->i=x;
+							spot->j=y;
+							spot->values = sudoku->values[x][y];
+							spot_exists = 1;
+						}
+					}
+				}
 			}
 		}
 	}
-	return NULL;
+	if(spot_exists)
+	{
+		return spot;
+	}else
+	{
+		return NULL;
+	}
 }
 
 //Function to print the board to stdout.
