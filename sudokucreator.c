@@ -58,31 +58,25 @@ void delete_value(value_head* head, int val)
 	value *now, *last;
 
 	last = NULL;
-	if(head->first == NULL) return;
 
-	for(now=head->first;; now = (value *)now->next)
+	for(now=head->first ; now != NULL ; now = (value *) now->next)
 	{	
 		if(now->available == val)
 		{
 			if(last == NULL)
 			{
 				head->first = (value *) now->next;
+				free(now);
 			}else
 			{
 				last->next = (value *) now->next;
+				free(now);
+				now = last;
 			}
 			head->length -=1;
-
-			if(now->next == NULL)
-			{
-				break;
-			}else
-			{
-				continue;
-			}
-			//free(now);
+			continue;
 		}
-		last=now;
+		last = now;
 		if(now->next == NULL)
 		{
 			return;
@@ -93,17 +87,27 @@ void delete_value(value_head* head, int val)
 
 
 
-void random_board(sudoku_board *sudoku)
+int random_board(sudoku_board *sudoku)
 {
 	int value,i;
 	board_position *spot;
-	i=0;
-	for(spot = get_unfilled_space(sudoku);i<82 && get_unfilled_space(sudoku) != NULL;spot=get_unfilled_space(sudoku))
+	
+	for(i=0;i<81;i++)
 	{
+		spot = (board_position *) get_unfilled_space(sudoku);
+		if(spot == NULL) break;
 		fill_with_random_sudoku_value(spot);
 		sudoku->board[spot->i][spot->j] = spot->value;
 		remove_invalid(sudoku,spot);
-		i++;
+		free(spot);
+		spot=NULL;
+	}
+	if(i==81)
+	{
+		return 1;
+	}else
+	{
+		return 0;
 	}
 
 }

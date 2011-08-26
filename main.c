@@ -1,4 +1,3 @@
-
 #include "sudokucreator.c"
 #include <stdio.h>
 int main()
@@ -9,11 +8,15 @@ int main()
 	sudoku_board * f;
 	f = (sudoku_board *) sudokucreator();
 	srand(time(NULL));
-
 	random_board(f);
-	
-	
-	//generic_board(f);
+	/*j=0;
+	for(i=0;i<1000;i++)
+	{
+		value_filler(f);
+		j +=random_board(f);
+	}
+	printf("%d out of %i",j,i);
+	*///generic_board(f);
 	//spot = (board_position *) get_unfilled_space(f);
 	//fill_with_random_sudoku_value(spot);
 	//remove_same_from_row(f,spot);
